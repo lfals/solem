@@ -1,5 +1,4 @@
 
-require('dotenv/config')
 import checksum from 'checksum';
 require('dotenv').config()
 
