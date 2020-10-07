@@ -15,10 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.startScan = exports.stopScan = void 0;
 require('dotenv/config');
 const checksum_1 = __importDefault(require("checksum"));
-const config_json_1 = require("../../config.json");
+require('dotenv').config();
 const index_1 = __importDefault(require("../getTitlesService/index"));
 const index_2 = require("../../index");
-const urls = [config_json_1.url];
+const urls = [process.env.URL];
 const sitesToCrawl = urls;
 const sitesWithHash = sitesToCrawl.map((url) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Setting up search for ${url}`);
@@ -54,7 +54,7 @@ function checkURL(sites) {
 var checkInterval;
 function scheduleStuff() {
     console.log("schedulleStuff");
-    checkInterval = setInterval(doStuff, 60000);
+    checkInterval = setInterval(doStuff, 600000);
 }
 function doStuff() {
     if (sitesWithHash) {

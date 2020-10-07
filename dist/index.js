@@ -14,10 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.messageFunction = void 0;
 const node_telegram_bot_api_1 = __importDefault(require("node-telegram-bot-api"));
-const config_json_1 = __importDefault(require("./config.json"));
+require('dotenv').config();
 const index_1 = __importDefault(require("./services/getTitlesService/index"));
 const index_2 = require("./services/scanForLast/index");
-const bot = new node_telegram_bot_api_1.default(config_json_1.default.token, { polling: true });
+const bot = new node_telegram_bot_api_1.default(`${process.env.TOKEN}`, { polling: true });
 const ids = [];
 index_2.startScan();
 // Bot Commands ---------------------------------------------

@@ -1,7 +1,8 @@
 import axios from 'axios'
 import cheerio from 'cheerio'
 
-import { url } from '../../config.json'
+require('dotenv').config()
+
 
 const caps:Array<string> = []
 const link:Array<string | undefined> = []
@@ -17,7 +18,7 @@ const pegandoDados = async(url: string) => {
 }
 
 const getLastChapter = async ()=>{
-    const content = await pegandoDados(url) 
+    const content = await pegandoDados(`${process.env.URL}`) 
     let chapterString = "";
     const $ = cheerio.load(content,{
         normalizeWhitespace: true,

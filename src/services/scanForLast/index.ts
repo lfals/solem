@@ -1,7 +1,8 @@
 
 require('dotenv/config')
 import checksum from 'checksum';
-import { url } from '../../config.json'
+require('dotenv').config()
+
 
 
 import getLastChapter from '../getTitlesService/index'
@@ -9,7 +10,7 @@ import { messageFunction } from '../../index'
 
 
 
-const urls = [ url ]
+const urls = [ process.env.URL ]
 
 const sitesToCrawl:any = urls
 const sitesWithHash = sitesToCrawl.map(async (url: string) => {
