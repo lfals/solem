@@ -1,83 +1,76 @@
 "use strict";
-// // Set up our environmental variables, you'll need to add a
-// // .env file into your root directory in order for this to work!
-// require('dotenv/config')
-// import rp from 'request-promise';
-// import checksum from 'checksum';
-// import co from 'cheerio';
-// import config from 'config';
-// console.log('🕵🏠 Initiating Pad-Patrol...')
-// function generateApartmentString(url: any) {
-//   rp(url)
-//     .then((HTMLresponse: any) => {
-//       const $ = co.load(HTMLresponse);
-//       let apartmentString = "";
-//       // use cheerio to parse HTML response and find all search results
-//       // then find all apartmentlistingIDs and concatenate them 
-//       $(".search-item.regular-ad").each((i: any, element: { attribs: { [x: string]: any; }; }) => {
-//         apartmentString += `${element.attribs["data-ad-id"]}`;
-//       });
-//       return apartmentString
-//     }).catch((err: any) => {
-//       console.log(`Could not complete fetch of ${url}: ${err}`)
-//     })
-// }
-// // Instantiate the site URLs outsite of any method.
-// // This way, they will keep their state so we can check against
-// // previous values
-// const sitesToCrawl = config.get("urls");
-// const sitesWithHash = sitesToCrawl.map(async (url: string) => {
-//   console.log(`Setting up search for ${url.split('/')[5]}`)
-//   const hash = checksum(await generateApartmentString(url))
-//   return {
-//     url,
-//     hash
-//   }
-// });
-// function buildMessage(url: string) {
-//   // This is the position of the search query inside kijiji's URL slug
-//   const location = url.split('/')[5]
-//   return {
-//     to: process.env.NUMBER_TO_TEXT,
-//     from: process.env.TWILIO_NUMBER,
-//     body: `
-//            There are new listings available in your search for ${location} - 
-//            check them out here:  ${url}
-//            `
-//   };
-// }
-// async function huntForChanges(index: string | number) {
-//   // We pass only the index to avoid complex mutations of the site objects
-//   // instead we mofidy the main object directly by using it's index
-//   const {
-//     url,
-//     hash: oldHash
-//   } = await sitesWithHash[index];
-//   const apartmentString = generateApartmentString(url)
-//   const newHash = checksum(apartmentString);
-//   // if the new hash and old hash are not equal, set the site hash to the new value
-//   // and send an SMS alerting changes
-//   if (newHash !== oldHash) {
-//     console.log(`💡 There is a new post!`);
-//     sitesWithHash[index].hash = newHash;
-//     // send.SMS(buildMessage(url)); // send message
-//     return;
-//   }
-//   // if we find no updates, report back and return
-//   console.log(`😓 Nothing to report on your search for ${url.split('/')[5]}.`)
-// }
-// // This function will run inside our setInterval
-// function checkURL(sites: any[]) {
-//   console.log(`🕵️  Checking for updates...`);
-//   sites.forEach(async (site: any, index: any) => {
-//     await huntForChanges(index);
-//   });
-// }
-// // 600000ms = 10 minutes
-// setInterval(() => {
-//   if (sitesWithHash) {
-//     checkURL(sitesWithHash);
-//   } else {
-//     console.log(`Please add URLs to your .env file!`)
-//   }
-// }, 600000);
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.startScan = exports.stopScan = void 0;
+require('dotenv/config');
+const checksum_1 = __importDefault(require("checksum"));
+const config_json_1 = require("../../config.json");
+const index_1 = __importDefault(require("../getTitlesService/index"));
+const index_2 = require("../../index");
+const urls = [config_json_1.url];
+const sitesToCrawl = urls;
+const sitesWithHash = sitesToCrawl.map((url) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(`Setting up search for ${url}`);
+    const { chapterString } = yield index_1.default();
+    const hash = checksum_1.default(chapterString);
+    return {
+        url,
+        hash,
+    };
+}));
+function huntForChanges(index) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { url, hash } = yield sitesWithHash[index];
+        const { chapterString, lastChapter, lastLink } = yield index_1.default();
+        var oldHash = hash;
+        var newHash = checksum_1.default(chapterString);
+        if (newHash !== oldHash) {
+            var oldHash = checksum_1.default(chapterString);
+            index_2.messageFunction(lastChapter);
+            index_2.messageFunction(`${lastLink}`);
+            clearInterval(checkInterval);
+            return oldHash;
+        }
+        console.log(`😓 Nothing to report on your search for ${url}.`);
+    });
+}
+function checkURL(sites) {
+    console.log(`🕵️  Checking for updates...`);
+    sites.forEach((site, index) => __awaiter(this, void 0, void 0, function* () {
+        yield huntForChanges(index);
+    }));
+}
+var checkInterval;
+function scheduleStuff() {
+    console.log("schedulleStuff");
+    checkInterval = setInterval(doStuff, 60000);
+}
+function doStuff() {
+    if (sitesWithHash) {
+        console.log("checkURL");
+        checkURL(sitesWithHash);
+    }
+    else {
+        console.log(`Please add URLs to your config file!`);
+    }
+}
+function stopScan() {
+    console.log('stopped');
+    clearInterval(checkInterval);
+}
+exports.stopScan = stopScan;
+function startScan() {
+    scheduleStuff();
+}
+exports.startScan = startScan;

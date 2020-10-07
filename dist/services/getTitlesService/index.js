@@ -14,21 +14,37 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const cheerio_1 = __importDefault(require("cheerio"));
+const config_json_1 = require("../../config.json");
 const caps = [];
+const link = [];
 const pegandoDados = (url) => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield axios_1.default.get(url);
-    return response.data;
+    try {
+        const response = yield axios_1.default.get(url);
+        return response.data;
+    }
+    catch (error) {
+        console.log(error);
+    }
 });
 const getLastChapter = () => __awaiter(void 0, void 0, void 0, function* () {
-    const content = yield pegandoDados('https://neoxscans.com/manga/14357/');
+    const content = yield pegandoDados(config_json_1.url);
+    let chapterString = "";
     const $ = cheerio_1.default.load(content, {
         normalizeWhitespace: true,
         xmlMode: true
     });
-    $('.wp-manga-chapter').each((i, e) => {
+    $('.wp-manga-chapter > a').each((i, e) => {
         caps[i] = $(e).text();
+        link[i] = $(e).attr('href');
+        chapterString += `${$(e).text()}`;
     });
     const lastChapter = caps[0];
-    return lastChapter;
+    const lastLink = link[0];
+    const responses = {
+        lastLink,
+        lastChapter,
+        chapterString,
+    };
+    return responses;
 });
 exports.default = getLastChapter;
