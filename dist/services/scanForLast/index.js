@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.startScan = exports.stopScan = void 0;
-require('dotenv/config');
 const checksum_1 = __importDefault(require("checksum"));
 require('dotenv').config();
 const index_1 = __importDefault(require("../getTitlesService/index"));
