@@ -1,5 +1,5 @@
 import TelegramBot from 'node-telegram-bot-api'
-
+//krl eu odeio cloudflare
 require('dotenv').config()
 
 import getLastChapter from './services/getTitlesService/index'
