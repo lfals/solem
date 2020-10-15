@@ -1,5 +1,5 @@
 {
-  "name": "Solem",
+  "name": "solem",
   "version": "1.0.0",
   "main": "node dist/index.js",
   "scripts": {
@@ -25,3 +25,5 @@
     "@types/request-promise": "^4.1.46"
   }
 }
+
+
